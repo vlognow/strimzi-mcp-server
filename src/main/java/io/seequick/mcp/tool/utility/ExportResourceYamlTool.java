@@ -138,10 +138,8 @@ public class ExportResourceYamlTool extends AbstractStrimziTool {
         return switch (kind) {
             case "Kafka" -> kubernetesClient.resources(Kafka.class, KafkaList.class)
                     .inNamespace(namespace).withName(name).get();
-            case "KafkaTopic" -> kubernetesClient.resources(KafkaTopic.class, KafkaTopicList.class)
-                    .inNamespace(namespace).withName(name).get();
-            case "KafkaUser" -> kubernetesClient.resources(KafkaUser.class, KafkaUserList.class)
-                    .inNamespace(namespace).withName(name).get();
+            case "KafkaTopic" -> repository(KafkaTopic.class, KafkaTopicList.class).get(namespace, name);
+            case "KafkaUser" -> repository(KafkaUser.class, KafkaUserList.class).get(namespace, name);
             case "KafkaConnect" -> kubernetesClient.resources(KafkaConnect.class, KafkaConnectList.class)
                     .inNamespace(namespace).withName(name).get();
             case "KafkaConnector" -> kubernetesClient.resources(KafkaConnector.class, KafkaConnectorList.class)

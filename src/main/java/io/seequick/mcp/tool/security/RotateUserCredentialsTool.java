@@ -60,10 +60,7 @@ public class RotateUserCredentialsTool extends AbstractStrimziTool {
             String name = getStringArg(args, "name");
             String namespace = getStringArg(args, "namespace");
 
-            KafkaUser user = kubernetesClient.resources(KafkaUser.class, KafkaUserList.class)
-                    .inNamespace(namespace)
-                    .withName(name)
-                    .get();
+            KafkaUser user = repository(KafkaUser.class, KafkaUserList.class).get(namespace, name);
 
             if (user == null) {
                 return error("KafkaUser not found: " + namespace + "/" + name);
@@ -75,18 +72,13 @@ public class RotateUserCredentialsTool extends AbstractStrimziTool {
                 authType = user.getSpec().getAuthentication().getType();
             }
 
-            // Apply the rotation annotation
+            // Apply the rotation annotation then update
             String timestamp = Instant.now().toString();
-            kubernetesClient.resources(KafkaUser.class, KafkaUserList.class)
-                    .inNamespace(namespace)
-                    .withName(name)
-                    .edit(u -> {
-                        if (u.getMetadata().getAnnotations() == null) {
-                            u.getMetadata().setAnnotations(new HashMap<>());
-                        }
-                        u.getMetadata().getAnnotations().put(ROTATION_ANNOTATION, timestamp);
-                        return u;
-                    });
+            if (user.getMetadata().getAnnotations() == null) {
+                user.getMetadata().setAnnotations(new HashMap<>());
+            }
+            user.getMetadata().getAnnotations().put(ROTATION_ANNOTATION, timestamp);
+            updateResource(KafkaUser.class, KafkaUserList.class, namespace, user);
 
             StringBuilder result = new StringBuilder();
             result.append("Triggered credential rotation for KafkaUser: ").append(namespace).append("/").append(name).append("\n");

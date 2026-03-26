@@ -1,8 +1,10 @@
 package io.seequick.mcp.tool.observability.health;
 
+import io.seequick.mcp.StrimziApiVersion;
+import io.seequick.mcp.tool.StrimziLabels;
+import io.seequick.mcp.tool.StrimziResourceRepository;
 import io.strimzi.api.kafka.model.user.KafkaUser;
 import io.strimzi.api.kafka.model.user.KafkaUserList;
-import io.seequick.mcp.tool.StrimziLabels;
 
 import java.util.List;
 
@@ -38,28 +40,13 @@ public class UserHealthChecker implements HealthChecker {
     }
 
     private List<KafkaUser> listUsers(HealthCheckContext context) {
-        List<KafkaUser> users;
+        StrimziResourceRepository<KafkaUser, KafkaUserList> repo =
+                new StrimziResourceRepository<>(context.getClient(), KafkaUser.class, KafkaUserList.class,
+                        StrimziApiVersion.getTopicUserVersion());
 
-        if (context.hasNamespaceFilter()) {
-            users = context.getClient().resources(KafkaUser.class, KafkaUserList.class)
-                    .inNamespace(context.getNamespace())
-                    .list()
-                    .getItems();
-        } else {
-            users = context.getClient().resources(KafkaUser.class, KafkaUserList.class)
-                    .inAnyNamespace()
-                    .list()
-                    .getItems();
-        }
-
-        if (context.hasClusterFilter()) {
-            users = users.stream()
-                    .filter(u -> u.getMetadata().getLabels() != null &&
-                            context.getKafkaCluster().equals(u.getMetadata().getLabels().get(StrimziLabels.CLUSTER)))
-                    .toList();
-        }
-
-        return users;
+        String namespace = context.hasNamespaceFilter() ? context.getNamespace() : null;
+        String cluster = context.hasClusterFilter() ? context.getKafkaCluster() : null;
+        return repo.list(namespace, cluster).getItems();
     }
 
     private boolean isUnready(KafkaUser user) {
