@@ -115,6 +115,19 @@ Download from [GitHub Releases](https://github.com/see-quick/strimzi-mcp-server/
 claude mcp add strimzi -- java -jar /path/to/strimzi-mcp-server.jar
 ```
 
+## Compatibility
+
+| Strimzi version | API version used |
+|----------------|-----------------|
+| >= 0.41.0      | `v1`            |
+| <= 0.40.0      | `v1beta2`       |
+
+The server auto-detects the available API version at startup. To override, set `STRIMZI_API_VERSION`:
+
+```bash
+export STRIMZI_API_VERSION=v1beta2
+```
+
 ## Configuration
 
 The server uses your local kubeconfig (`~/.kube/config`) to connect to the Kubernetes cluster.
