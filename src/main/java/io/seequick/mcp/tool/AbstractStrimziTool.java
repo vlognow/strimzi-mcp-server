@@ -11,6 +11,9 @@ import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
 import io.modelcontextprotocol.spec.McpSchema.TextContent;
 import io.modelcontextprotocol.spec.McpSchema.Tool;
+import io.seequick.mcp.StrimziApiVersion;
+import io.strimzi.api.kafka.model.topic.KafkaTopic;
+import io.strimzi.api.kafka.model.user.KafkaUser;
 
 import java.util.List;
 import java.util.Map;
@@ -149,11 +152,21 @@ public abstract class AbstractStrimziTool implements StrimziTool {
     }
 
     /**
-     * Creates a repository for the specified resource types.
+     * Creates a version-aware repository for the specified resource types.
+     * KafkaTopic and KafkaUser repositories automatically use the detected API version
+     * (v1 or v1beta2) to handle clusters running Strimzi &le; 0.40.0.
      */
     protected <T extends HasMetadata, TList extends KubernetesResourceList<T>> StrimziResourceRepository<T, TList> repository(
             Class<T> resourceClass, Class<TList> listClass) {
-        return new StrimziResourceRepository<>(kubernetesClient, resourceClass, listClass);
+        return new StrimziResourceRepository<>(kubernetesClient, resourceClass, listClass,
+                versionOverrideFor(resourceClass));
+    }
+
+    private String versionOverrideFor(Class<?> resourceClass) {
+        if (resourceClass == KafkaTopic.class || resourceClass == KafkaUser.class) {
+            return StrimziApiVersion.getTopicUserVersion();
+        }
+        return null;
     }
 
     /**
@@ -195,6 +208,14 @@ public abstract class AbstractStrimziTool implements StrimziTool {
     protected <T extends HasMetadata, TList extends KubernetesResourceList<T>> T createResource(
             Class<T> resourceClass, Class<TList> listClass, String namespace, T resource) {
         return repository(resourceClass, listClass).create(namespace, resource);
+    }
+
+    /**
+     * Updates a resource in the specified namespace.
+     */
+    protected <T extends HasMetadata, TList extends KubernetesResourceList<T>> T updateResource(
+            Class<T> resourceClass, Class<TList> listClass, String namespace, T resource) {
+        return repository(resourceClass, listClass).update(namespace, resource);
     }
 
     /**

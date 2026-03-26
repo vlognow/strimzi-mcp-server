@@ -1,8 +1,9 @@
 package io.seequick.mcp.tool.observability.health;
 
+import io.seequick.mcp.StrimziApiVersion;
+import io.seequick.mcp.tool.StrimziResourceRepository;
 import io.strimzi.api.kafka.model.topic.KafkaTopic;
 import io.strimzi.api.kafka.model.topic.KafkaTopicList;
-import io.seequick.mcp.tool.StrimziLabels;
 
 import java.util.List;
 
@@ -38,31 +39,13 @@ public class TopicHealthChecker implements HealthChecker {
     }
 
     private List<KafkaTopic> listTopics(HealthCheckContext context) {
-        List<KafkaTopic> topics;
+        StrimziResourceRepository<KafkaTopic, KafkaTopicList> repo =
+                new StrimziResourceRepository<>(context.getClient(), KafkaTopic.class, KafkaTopicList.class,
+                        StrimziApiVersion.getTopicUserVersion());
 
-        if (context.hasNamespaceFilter()) {
-            var topicsResource = context.getClient().resources(KafkaTopic.class, KafkaTopicList.class)
-                    .inNamespace(context.getNamespace());
-            if (context.hasClusterFilter()) {
-                topics = topicsResource.withLabel(StrimziLabels.CLUSTER, context.getKafkaCluster())
-                        .list().getItems();
-            } else {
-                topics = topicsResource.list().getItems();
-            }
-        } else {
-            topics = context.getClient().resources(KafkaTopic.class, KafkaTopicList.class)
-                    .inAnyNamespace()
-                    .list()
-                    .getItems();
-            if (context.hasClusterFilter()) {
-                topics = topics.stream()
-                        .filter(t -> t.getMetadata().getLabels() != null &&
-                                context.getKafkaCluster().equals(t.getMetadata().getLabels().get(StrimziLabels.CLUSTER)))
-                        .toList();
-            }
-        }
-
-        return topics;
+        String namespace = context.hasNamespaceFilter() ? context.getNamespace() : null;
+        String cluster = context.hasClusterFilter() ? context.getKafkaCluster() : null;
+        return repo.list(namespace, cluster).getItems();
     }
 
     private boolean isUnready(KafkaTopic topic) {

@@ -48,6 +48,8 @@ public class StrimziMcpServer {
 
     public static void main(String[] args) {
         KubernetesClient client = new KubernetesClientBuilder().build();
+        String topicUserVersion = StrimziApiVersionDetector.detect(client);
+        StrimziApiVersion.setTopicUserVersion(topicUserVersion);
         StrimziMcpServer server = new StrimziMcpServer(client);
         server.start();
     }
