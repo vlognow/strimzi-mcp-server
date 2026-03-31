@@ -1,8 +1,22 @@
 {
   "mcpServers": {
-    "strimzi": {
+    "kafka-dev": {
       "command": "${CLAUDE_PLUGIN_ROOT}/bin/strimzi-mcp",
-      "args": []
+      "env": {
+        "KUBERNETES_CONTEXT": "machinify-dev"
+      }
+    },
+    "kafka-staging": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/bin/strimzi-mcp",
+      "env": {
+        "KUBERNETES_CONTEXT": "machinify-staging"
+      }
+    },
+    "kafka-cleardata": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/bin/strimzi-mcp",
+      "env": {
+        "KUBERNETES_CONTEXT": "machinify-cleardata"
+      }
     }
   }
 }
