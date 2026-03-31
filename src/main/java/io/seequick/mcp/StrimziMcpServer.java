@@ -21,6 +21,7 @@ import io.seequick.mcp.tool.factory.UtilityToolFactory;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Strimzi MCP Server - provides MCP tools for interacting with Strimzi Kafka on Kubernetes.
@@ -54,18 +55,26 @@ public class StrimziMcpServer {
         // Suppress stdout during API version detection: the Kubernetes exec credential plugin
         // (e.g. aws sso login) may write interactive prompts to stdout, which corrupts the
         // MCP stdio transport before it has started.
-        PrintStream origOut = System.out;
-        System.setOut(new PrintStream(OutputStream.nullOutputStream()));
-        String topicUserVersion;
-        try {
-            topicUserVersion = StrimziApiVersionDetector.detect(client);
-        } finally {
-            System.setOut(origOut);
-        }
+        String topicUserVersion = withSuppressedStdout(() -> StrimziApiVersionDetector.detect(client));
         StrimziApiVersion.setTopicUserVersion(topicUserVersion);
 
         StrimziMcpServer server = new StrimziMcpServer(client);
         server.start();
+    }
+
+    /**
+     * Runs {@code action} with stdout redirected to /dev/null, then restores the original stdout.
+     * Prevents any output written during the action (e.g. from AWS credential plugins) from
+     * corrupting the MCP stdio transport.
+     */
+    static <T> T withSuppressedStdout(Supplier<T> action) {
+        PrintStream origOut = System.out;
+        System.setOut(new PrintStream(OutputStream.nullOutputStream()));
+        try {
+            return action.get();
+        } finally {
+            System.setOut(origOut);
+        }
     }
 
     /**
