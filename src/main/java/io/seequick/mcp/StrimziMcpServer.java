@@ -18,6 +18,8 @@ import io.seequick.mcp.tool.factory.TopicToolFactory;
 import io.seequick.mcp.tool.factory.UserToolFactory;
 import io.seequick.mcp.tool.factory.UtilityToolFactory;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -48,8 +50,20 @@ public class StrimziMcpServer {
 
     public static void main(String[] args) {
         KubernetesClient client = new KubernetesClientBuilder().build();
-        String topicUserVersion = StrimziApiVersionDetector.detect(client);
+
+        // Suppress stdout during API version detection: the Kubernetes exec credential plugin
+        // (e.g. aws sso login) may write interactive prompts to stdout, which corrupts the
+        // MCP stdio transport before it has started.
+        PrintStream origOut = System.out;
+        System.setOut(new PrintStream(OutputStream.nullOutputStream()));
+        String topicUserVersion;
+        try {
+            topicUserVersion = StrimziApiVersionDetector.detect(client);
+        } finally {
+            System.setOut(origOut);
+        }
         StrimziApiVersion.setTopicUserVersion(topicUserVersion);
+
         StrimziMcpServer server = new StrimziMcpServer(client);
         server.start();
     }
