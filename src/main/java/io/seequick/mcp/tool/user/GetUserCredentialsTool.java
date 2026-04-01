@@ -1,6 +1,7 @@
 package io.seequick.mcp.tool.user;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -32,8 +33,8 @@ public class GetUserCredentialsTool extends AbstractStrimziTool {
             }
             """;
 
-    public GetUserCredentialsTool(KubernetesClient kubernetesClient) {
-        super(kubernetesClient);
+    public GetUserCredentialsTool(KubernetesClientResolver clientResolver) {
+        super(clientResolver);
     }
 
     @Override

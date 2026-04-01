@@ -1,6 +1,7 @@
 package io.seequick.mcp.tool.topic;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
@@ -25,7 +26,7 @@ class UpdateTopicConfigToolTest {
 
     @BeforeEach
     void setUp() {
-        tool = new UpdateTopicConfigTool(client);
+        tool = new UpdateTopicConfigTool(KubernetesClientResolver.fixed(client));
     }
 
     @Test

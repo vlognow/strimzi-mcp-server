@@ -1,6 +1,6 @@
 package io.seequick.mcp.tool.observability;
 
-import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -43,8 +43,8 @@ public class HealthCheckTool extends AbstractStrimziTool {
             new ConnectorHealthChecker()
     );
 
-    public HealthCheckTool(KubernetesClient kubernetesClient) {
-        super(kubernetesClient);
+    public HealthCheckTool(KubernetesClientResolver clientResolver) {
+        super(clientResolver);
     }
 
     @Override

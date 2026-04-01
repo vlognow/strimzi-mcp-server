@@ -2,6 +2,7 @@ package io.seequick.mcp.tool.observability;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -40,8 +41,8 @@ public class GetOperatorLogsTool extends AbstractStrimziTool {
             }
             """;
 
-    public GetOperatorLogsTool(KubernetesClient kubernetesClient) {
-        super(kubernetesClient);
+    public GetOperatorLogsTool(KubernetesClientResolver clientResolver) {
+        super(clientResolver);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package io.seequick.mcp.tool.cluster;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
@@ -24,7 +25,7 @@ class DescribeKafkaConnectToolTest {
 
     @BeforeEach
     void setUp() {
-        tool = new DescribeKafkaConnectTool(client);
+        tool = new DescribeKafkaConnectTool(KubernetesClientResolver.fixed(client));
     }
 
     @Test
