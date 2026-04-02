@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -66,8 +67,8 @@ public class ExportResourceYamlTool extends AbstractStrimziTool {
         YAML_MAPPER = new ObjectMapper(factory);
     }
 
-    public ExportResourceYamlTool(KubernetesClient kubernetesClient) {
-        super(kubernetesClient);
+    public ExportResourceYamlTool(KubernetesClientResolver clientResolver) {
+        super(clientResolver);
     }
 
     @Override

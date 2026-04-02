@@ -1,8 +1,6 @@
 package io.seequick.mcp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
@@ -41,24 +39,24 @@ public class StrimziMcpServer {
             new UtilityToolFactory()
     );
 
-    private final KubernetesClient kubernetesClient;
+    private final KubernetesClientResolver clientResolver;
     private final List<StrimziTool> tools;
 
-    public StrimziMcpServer(KubernetesClient kubernetesClient) {
-        this.kubernetesClient = kubernetesClient;
+    public StrimziMcpServer(KubernetesClientResolver clientResolver) {
+        this.clientResolver = clientResolver;
         this.tools = createTools();
     }
 
     public static void main(String[] args) {
-        KubernetesClient client = new KubernetesClientBuilder().build();
+        KubernetesClientResolver resolver = new KubernetesClientResolver();
 
         // Suppress stdout during API version detection: the Kubernetes exec credential plugin
         // (e.g. aws sso login) may write interactive prompts to stdout, which corrupts the
         // MCP stdio transport before it has started.
-        String topicUserVersion = withSuppressedStdout(() -> StrimziApiVersionDetector.detect(client));
+        String topicUserVersion = withSuppressedStdout(() -> StrimziApiVersionDetector.detect(resolver.resolveDefault()));
         StrimziApiVersion.setTopicUserVersion(topicUserVersion);
 
-        StrimziMcpServer server = new StrimziMcpServer(client);
+        StrimziMcpServer server = new StrimziMcpServer(resolver);
         server.start();
     }
 
@@ -82,7 +80,7 @@ public class StrimziMcpServer {
      */
     private List<StrimziTool> createTools() {
         return FACTORIES.stream()
-                .flatMap(factory -> factory.createTools(kubernetesClient).stream())
+                .flatMap(factory -> factory.createTools(clientResolver).stream())
                 .toList();
     }
 

@@ -11,10 +11,12 @@ import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
 import io.modelcontextprotocol.spec.McpSchema.TextContent;
 import io.modelcontextprotocol.spec.McpSchema.Tool;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.seequick.mcp.StrimziApiVersion;
 import io.strimzi.api.kafka.model.topic.KafkaTopic;
 import io.strimzi.api.kafka.model.user.KafkaUser;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +27,11 @@ public abstract class AbstractStrimziTool implements StrimziTool {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    protected final KubernetesClient kubernetesClient;
+    private final KubernetesClientResolver clientResolver;
+    protected KubernetesClient kubernetesClient;
 
-    protected AbstractStrimziTool(KubernetesClient kubernetesClient) {
-        this.kubernetesClient = kubernetesClient;
+    protected AbstractStrimziTool(KubernetesClientResolver clientResolver) {
+        this.clientResolver = clientResolver;
     }
 
     /**
@@ -82,13 +85,30 @@ public abstract class AbstractStrimziTool implements StrimziTool {
 
     @Override
     public McpServerFeatures.SyncToolSpecification getSpecification() {
+        JsonSchema baseSchema = getInputSchema();
+        Map<String, Object> properties = new LinkedHashMap<>();
+        if (baseSchema.properties() != null) {
+            properties.putAll(baseSchema.properties());
+        }
+        properties.put("context", Map.of(
+            "type", "string",
+            "description", "Kubernetes context to use (e.g. machinify-dev, machinify-staging). Defaults to current kubeconfig context if omitted."
+        ));
+        JsonSchema enrichedSchema = new JsonSchema(
+            baseSchema.type(), properties, baseSchema.required(),
+            baseSchema.additionalProperties(), baseSchema.defs(), baseSchema.definitions()
+        );
+
         return new McpServerFeatures.SyncToolSpecification.Builder()
             .tool(Tool.builder()
                 .name(getName())
                 .description(getDescription())
-                .inputSchema(getInputSchema())
+                .inputSchema(enrichedSchema)
                 .build())
-            .callHandler((exchange, args) -> execute(args))
+            .callHandler((exchange, args) -> {
+                this.kubernetesClient = clientResolver.resolve(getStringArg(args, "context"));
+                return execute(args);
+            })
             .build();
     }
 

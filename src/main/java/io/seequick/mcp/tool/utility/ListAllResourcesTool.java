@@ -1,6 +1,7 @@
 package io.seequick.mcp.tool.utility;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -43,8 +44,8 @@ public class ListAllResourcesTool extends AbstractStrimziTool {
             }
             """;
 
-    public ListAllResourcesTool(KubernetesClient kubernetesClient) {
-        super(kubernetesClient);
+    public ListAllResourcesTool(KubernetesClientResolver clientResolver) {
+        super(clientResolver);
     }
 
     @Override

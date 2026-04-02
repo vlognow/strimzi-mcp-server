@@ -1,6 +1,7 @@
 package io.seequick.mcp.tool.cluster;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -34,8 +35,8 @@ public class StopRebalanceTool extends AbstractStrimziTool {
 
     private static final String REBALANCE_ANNOTATION = "strimzi.io/rebalance";
 
-    public StopRebalanceTool(KubernetesClient kubernetesClient) {
-        super(kubernetesClient);
+    public StopRebalanceTool(KubernetesClientResolver clientResolver) {
+        super(clientResolver);
     }
 
     @Override

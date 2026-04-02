@@ -1,6 +1,6 @@
 package io.seequick.mcp.tool.factory;
 
-import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.seequick.mcp.tool.StrimziTool;
 import io.seequick.mcp.tool.kafka.GetKafkaListenersTool;
 import io.seequick.mcp.tool.kafka.GetKafkaStatusTool;
@@ -16,13 +16,13 @@ import java.util.List;
 public class KafkaToolFactory implements ToolFactory {
 
     @Override
-    public List<StrimziTool> createTools(KubernetesClient client) {
+    public List<StrimziTool> createTools(KubernetesClientResolver clientResolver) {
         return List.of(
-                new ListKafkasTool(client),
-                new GetKafkaStatusTool(client),
-                new GetKafkaListenersTool(client),
-                new RestartKafkaBrokerTool(client),
-                new ScaleNodePoolTool(client)
+                new ListKafkasTool(clientResolver),
+                new GetKafkaStatusTool(clientResolver),
+                new GetKafkaListenersTool(clientResolver),
+                new RestartKafkaBrokerTool(clientResolver),
+                new ScaleNodePoolTool(clientResolver)
         );
     }
 }

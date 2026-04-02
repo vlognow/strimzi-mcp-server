@@ -1,6 +1,6 @@
 package io.seequick.mcp.tool.factory;
 
-import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.seequick.mcp.tool.StrimziTool;
 import io.seequick.mcp.tool.observability.DescribeKafkaPodTool;
 import io.seequick.mcp.tool.observability.GetKafkaEventsTool;
@@ -16,13 +16,13 @@ import java.util.List;
 public class ObservabilityToolFactory implements ToolFactory {
 
     @Override
-    public List<StrimziTool> createTools(KubernetesClient client) {
+    public List<StrimziTool> createTools(KubernetesClientResolver clientResolver) {
         return List.of(
-                new GetKafkaLogsTool(client),
-                new GetOperatorLogsTool(client),
-                new GetKafkaEventsTool(client),
-                new DescribeKafkaPodTool(client),
-                new HealthCheckTool(client)
+                new GetKafkaLogsTool(clientResolver),
+                new GetOperatorLogsTool(clientResolver),
+                new GetKafkaEventsTool(clientResolver),
+                new DescribeKafkaPodTool(clientResolver),
+                new HealthCheckTool(clientResolver)
         );
     }
 }

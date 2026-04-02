@@ -1,6 +1,7 @@
 package io.seequick.mcp.tool.user;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
@@ -27,7 +28,7 @@ class ListUsersToolTest {
 
     @BeforeEach
     void setUp() {
-        tool = new ListUsersTool(client);
+        tool = new ListUsersTool(KubernetesClientResolver.fixed(client));
     }
 
     @Test

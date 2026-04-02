@@ -5,6 +5,7 @@ import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
 import io.modelcontextprotocol.spec.McpSchema.TextContent;
+import io.seequick.mcp.KubernetesClientResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +28,7 @@ class AbstractStrimziToolTest {
 
     @BeforeEach
     void setUp() {
-        tool = new TestStrimziTool(kubernetesClient);
+        tool = new TestStrimziTool(KubernetesClientResolver.fixed(kubernetesClient));
     }
 
     @Test
@@ -228,13 +229,37 @@ class AbstractStrimziToolTest {
         assertThat(spec.tool().description()).isEqualTo("Test tool for unit testing");
     }
 
+    @Test
+    void getSpecificationShouldInjectContextProperty() {
+        var spec = tool.getSpecification();
+        var schema = spec.tool().inputSchema();
+
+        assertThat(schema.properties()).containsKey("context");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> contextProp = (Map<String, Object>) schema.properties().get("context");
+        assertThat(contextProp.get("type")).isEqualTo("string");
+        assertThat((String) contextProp.get("description")).contains("Kubernetes context");
+    }
+
+    @Test
+    void callHandlerShouldResolveClientFromContextArg() {
+        var spec = tool.getSpecification();
+        Map<String, Object> args = new HashMap<>();
+        args.put("context", "my-context");
+        McpSchema.CallToolRequest request = new McpSchema.CallToolRequest("test_tool", args);
+
+        CallToolResult result = spec.callHandler().apply(null, request);
+
+        assertThat(result.isError()).isFalse();
+    }
+
     /**
      * Test implementation of AbstractStrimziTool for testing protected methods.
      */
     private static class TestStrimziTool extends AbstractStrimziTool {
 
-        protected TestStrimziTool(KubernetesClient kubernetesClient) {
-            super(kubernetesClient);
+        protected TestStrimziTool(KubernetesClientResolver clientResolver) {
+            super(clientResolver);
         }
 
         @Override

@@ -1,6 +1,7 @@
 package io.seequick.mcp.tool.user;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -47,8 +48,8 @@ public class UpdateUserQuotasTool extends AbstractStrimziTool {
             }
             """;
 
-    public UpdateUserQuotasTool(KubernetesClient kubernetesClient) {
-        super(kubernetesClient);
+    public UpdateUserQuotasTool(KubernetesClientResolver clientResolver) {
+        super(clientResolver);
     }
 
     @Override

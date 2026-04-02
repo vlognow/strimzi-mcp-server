@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -34,8 +35,8 @@ public class DescribeKafkaPodTool extends AbstractStrimziTool {
             }
             """;
 
-    public DescribeKafkaPodTool(KubernetesClient kubernetesClient) {
-        super(kubernetesClient);
+    public DescribeKafkaPodTool(KubernetesClientResolver clientResolver) {
+        super(clientResolver);
     }
 
     @Override

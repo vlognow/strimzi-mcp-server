@@ -1,6 +1,6 @@
 package io.seequick.mcp.tool.factory;
 
-import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.seequick.mcp.tool.StrimziTool;
 import io.seequick.mcp.tool.cluster.ApproveRebalanceTool;
 import io.seequick.mcp.tool.cluster.CreateConnectorTool;
@@ -36,46 +36,46 @@ import java.util.List;
 public class ClusterToolFactory implements ToolFactory {
 
     @Override
-    public List<StrimziTool> createTools(KubernetesClient client) {
+    public List<StrimziTool> createTools(KubernetesClientResolver clientResolver) {
         return List.of(
                 // Node Pools
-                new ListNodePoolsTool(client),
-                new DescribeNodePoolTool(client),
+                new ListNodePoolsTool(clientResolver),
+                new DescribeNodePoolTool(clientResolver),
 
                 // Kafka Connect
-                new ListKafkaConnectsTool(client),
-                new DescribeKafkaConnectTool(client),
-                new ListConnectPluginsTool(client),
+                new ListKafkaConnectsTool(clientResolver),
+                new DescribeKafkaConnectTool(clientResolver),
+                new ListConnectPluginsTool(clientResolver),
 
                 // Connectors
-                new ListConnectorsTool(client),
-                new DescribeConnectorTool(client),
-                new CreateConnectorTool(client),
-                new DeleteConnectorTool(client),
-                new PauseConnectorTool(client),
-                new ResumeConnectorTool(client),
-                new RestartConnectorTool(client),
-                new UpdateConnectorConfigTool(client),
+                new ListConnectorsTool(clientResolver),
+                new DescribeConnectorTool(clientResolver),
+                new CreateConnectorTool(clientResolver),
+                new DeleteConnectorTool(clientResolver),
+                new PauseConnectorTool(clientResolver),
+                new ResumeConnectorTool(clientResolver),
+                new RestartConnectorTool(clientResolver),
+                new UpdateConnectorConfigTool(clientResolver),
 
                 // Rebalances (Cruise Control)
-                new ListRebalancesTool(client),
-                new DescribeRebalanceTool(client),
-                new CreateRebalanceTool(client),
-                new ApproveRebalanceTool(client),
-                new StopRebalanceTool(client),
-                new RefreshRebalanceTool(client),
+                new ListRebalancesTool(clientResolver),
+                new DescribeRebalanceTool(clientResolver),
+                new CreateRebalanceTool(clientResolver),
+                new ApproveRebalanceTool(clientResolver),
+                new StopRebalanceTool(clientResolver),
+                new RefreshRebalanceTool(clientResolver),
 
                 // MirrorMaker2
-                new ListMirrorMaker2sTool(client),
-                new DescribeMirrorMaker2Tool(client),
-                new CreateMirrorMaker2Tool(client),
+                new ListMirrorMaker2sTool(clientResolver),
+                new DescribeMirrorMaker2Tool(clientResolver),
+                new CreateMirrorMaker2Tool(clientResolver),
 
                 // Bridges
-                new ListBridgesTool(client),
-                new DescribeBridgeTool(client),
+                new ListBridgesTool(clientResolver),
+                new DescribeBridgeTool(clientResolver),
 
                 // Cluster Operator
-                new GetClusterOperatorStatusTool(client)
+                new GetClusterOperatorStatusTool(clientResolver)
         );
     }
 }

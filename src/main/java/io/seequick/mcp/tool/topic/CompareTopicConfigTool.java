@@ -1,6 +1,7 @@
 package io.seequick.mcp.tool.topic;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -49,8 +50,8 @@ public class CompareTopicConfigTool extends AbstractStrimziTool {
             "max.message.bytes", "1048588"
     );
 
-    public CompareTopicConfigTool(KubernetesClient kubernetesClient) {
-        super(kubernetesClient);
+    public CompareTopicConfigTool(KubernetesClientResolver clientResolver) {
+        super(clientResolver);
     }
 
     @Override
