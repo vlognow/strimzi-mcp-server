@@ -64,6 +64,13 @@
             <version>2.18.3</version>
         </dependency>
 
+        <!-- Embedded Tomcat for HTTP transport mode -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>11.0.5</version>
+        </dependency>
+
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
+import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
 import io.modelcontextprotocol.server.transport.StdioServerTransportProvider;
 import io.modelcontextprotocol.spec.McpSchema.ServerCapabilities;
 import io.seequick.mcp.tool.StrimziTool;
@@ -15,6 +16,8 @@ import io.seequick.mcp.tool.factory.ToolFactory;
 import io.seequick.mcp.tool.factory.TopicToolFactory;
 import io.seequick.mcp.tool.factory.UserToolFactory;
 import io.seequick.mcp.tool.factory.UtilityToolFactory;
+import org.apache.catalina.Context;
+import org.apache.catalina.startup.Tomcat;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -57,7 +60,13 @@ public class StrimziMcpServer {
         StrimziApiVersion.setTopicUserVersion(topicUserVersion);
 
         StrimziMcpServer server = new StrimziMcpServer(resolver);
-        server.start();
+
+        String httpPort = System.getenv("MCP_HTTP_PORT");
+        if (httpPort != null && !httpPort.isBlank()) {
+            server.startHttp(Integer.parseInt(httpPort));
+        } else {
+            server.start();
+        }
     }
 
     /**
@@ -105,6 +114,41 @@ public class StrimziMcpServer {
             Thread.currentThread().join();
         } catch (InterruptedException e) {
             syncServer.close();
+        }
+    }
+
+    /**
+     * Starts the MCP server with HTTP streamable transport on the given port.
+     * Activated when MCP_HTTP_PORT environment variable is set.
+     */
+    public void startHttp(int port) {
+        HttpServletStreamableServerTransportProvider transportProvider =
+                HttpServletStreamableServerTransportProvider.builder()
+                        .mcpEndpoint("/mcp")
+                        .build();
+
+        McpSyncServer syncServer = McpServer.sync(transportProvider)
+                .serverInfo(SERVER_NAME, SERVER_VERSION)
+                .capabilities(ServerCapabilities.builder()
+                        .tools(true)
+                        .build())
+                .build();
+
+        tools.forEach(tool -> syncServer.addTool(tool.getSpecification()));
+
+        try {
+            Tomcat tomcat = new Tomcat();
+            tomcat.setPort(port);
+            tomcat.getConnector();
+
+            Context ctx = tomcat.addContext("", null);
+            Tomcat.addServlet(ctx, "mcp", transportProvider).addMapping("/*");
+
+            tomcat.start();
+            System.err.println("Strimzi MCP Server listening on port " + port);
+            tomcat.getServer().await();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to start HTTP server on port " + port, e);
         }
     }
 }
