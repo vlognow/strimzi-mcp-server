@@ -1,15 +1,12 @@
 {
   "mcpServers": {
     "strimzi-dev": {
-      "type": "sse",
       "url": "https://strimzi-mcp.dev.machinify.net/mcp"
     },
     "strimzi-stg": {
-      "type": "sse",
       "url": "https://strimzi-mcp.stg.machinify.net/mcp"
     },
     "strimzi-cleardata": {
-      "type": "sse",
       "url": "https://strimzi-mcp.machinify.net/mcp"
     }
   }
