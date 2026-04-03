@@ -1,6 +1,6 @@
 package io.seequick.mcp.tool.security;
 
-import io.seequick.mcp.KubernetesClientResolver;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -35,8 +35,8 @@ public class RotateUserCredentialsTool extends AbstractStrimziTool {
 
     private static final String ROTATION_ANNOTATION = "strimzi.io/force-password-renewal";
 
-    public RotateUserCredentialsTool(KubernetesClientResolver clientResolver) {
-        super(clientResolver);
+    public RotateUserCredentialsTool(KubernetesClient kubernetesClient) {
+        super(kubernetesClient);
     }
 
     @Override

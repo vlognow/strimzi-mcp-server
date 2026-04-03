@@ -2,7 +2,6 @@ package io.seequick.mcp.tool.security;
 
 import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.seequick.mcp.KubernetesClientResolver;
 import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
@@ -26,7 +25,7 @@ class ListCertificatesToolTest {
 
     @BeforeEach
     void setUp() {
-        tool = new ListCertificatesTool(KubernetesClientResolver.fixed(client));
+        tool = new ListCertificatesTool(client);
     }
 
     @Test

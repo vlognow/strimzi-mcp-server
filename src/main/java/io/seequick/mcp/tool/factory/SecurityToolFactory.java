@@ -1,6 +1,6 @@
 package io.seequick.mcp.tool.factory;
 
-import io.seequick.mcp.KubernetesClientResolver;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.seequick.mcp.tool.StrimziTool;
 import io.seequick.mcp.tool.security.GetCertificateExpiryTool;
 import io.seequick.mcp.tool.security.ListCertificatesTool;
@@ -14,11 +14,11 @@ import java.util.List;
 public class SecurityToolFactory implements ToolFactory {
 
     @Override
-    public List<StrimziTool> createTools(KubernetesClientResolver clientResolver) {
+    public List<StrimziTool> createTools(KubernetesClient client) {
         return List.of(
-                new RotateUserCredentialsTool(clientResolver),
-                new ListCertificatesTool(clientResolver),
-                new GetCertificateExpiryTool(clientResolver)
+                new RotateUserCredentialsTool(client),
+                new ListCertificatesTool(client),
+                new GetCertificateExpiryTool(client)
         );
     }
 }

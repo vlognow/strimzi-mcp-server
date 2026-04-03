@@ -1,7 +1,6 @@
 package io.seequick.mcp.tool.cluster;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -33,8 +32,8 @@ public class DescribeMirrorMaker2Tool extends AbstractStrimziTool {
             }
             """;
 
-    public DescribeMirrorMaker2Tool(KubernetesClientResolver clientResolver) {
-        super(clientResolver);
+    public DescribeMirrorMaker2Tool(KubernetesClient kubernetesClient) {
+        super(kubernetesClient);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package io.seequick.mcp.tool.cluster;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -41,8 +40,8 @@ public class RestartConnectorTool extends AbstractStrimziTool {
     private static final String RESTART_ANNOTATION = "strimzi.io/restart";
     private static final String RESTART_TASK_ANNOTATION = "strimzi.io/restart-task";
 
-    public RestartConnectorTool(KubernetesClientResolver clientResolver) {
-        super(clientResolver);
+    public RestartConnectorTool(KubernetesClient kubernetesClient) {
+        super(kubernetesClient);
     }
 
     @Override
