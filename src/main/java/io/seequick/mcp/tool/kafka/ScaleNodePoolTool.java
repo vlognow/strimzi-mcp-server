@@ -1,7 +1,6 @@
 package io.seequick.mcp.tool.kafka;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -35,8 +34,8 @@ public class ScaleNodePoolTool extends AbstractStrimziTool {
             }
             """;
 
-    public ScaleNodePoolTool(KubernetesClientResolver clientResolver) {
-        super(clientResolver);
+    public ScaleNodePoolTool(KubernetesClient kubernetesClient) {
+        super(kubernetesClient);
     }
 
     @Override

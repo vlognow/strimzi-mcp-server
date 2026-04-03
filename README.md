@@ -132,39 +132,6 @@ export STRIMZI_API_VERSION=v1beta2
 
 The server uses your local kubeconfig (`~/.kube/config`) to connect to the Kubernetes cluster.
 
-Every tool accepts an optional `context` parameter to target a specific kubeconfig context (e.g. `machinify-dev`, `machinify-staging`). If omitted, the current context is used. Clients are created lazily and cached for the lifetime of the server process.
-
-## Development
-
-### Build
-
-```bash
-./mvnw package -DskipTests -q
-```
-
-### Run tests
-
-```bash
-./mvnw test
-```
-
-### Local testing with Claude Code
-
-Load the plugin directly from your local checkout:
-
-```bash
-claude --plugin-dir /path/to/strimzi-mcp-server
-```
-
-This starts Claude Code with the MCP server defined in `.claude-plugin/plugin.json`. The launcher script (`bin/strimzi-mcp`) builds the JAR on first run if needed.
-
-To iterate, rebuild the JAR then restart Claude Code:
-
-```bash
-./mvnw package -DskipTests -q
-claude --plugin-dir /path/to/strimzi-mcp-server
-```
-
 ## Requirements
 
 - Java 21+

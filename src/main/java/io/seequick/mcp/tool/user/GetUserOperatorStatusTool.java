@@ -1,7 +1,6 @@
 package io.seequick.mcp.tool.user;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -29,8 +28,8 @@ public class GetUserOperatorStatusTool extends AbstractStrimziTool {
             }
             """;
 
-    public GetUserOperatorStatusTool(KubernetesClientResolver clientResolver) {
-        super(clientResolver);
+    public GetUserOperatorStatusTool(KubernetesClient kubernetesClient) {
+        super(kubernetesClient);
     }
 
     @Override

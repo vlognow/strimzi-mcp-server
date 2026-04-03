@@ -2,21 +2,14 @@
 set -e
 
 PLUGIN_DIR="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+JAR_PATH="${PLUGIN_DIR}/target/strimzi-mcp-server.jar"
 
-# Find the latest built JAR (excluding maven's -original suffix)
-find_jar() {
-  ls -t "${PLUGIN_DIR}/target"/strimzi-mcp-server-*.jar 2>/dev/null | grep -v original | head -1
-}
-
-JAR_PATH=$(find_jar)
-
-if [ -z "$JAR_PATH" ]; then
-  echo "Building strimzi-mcp-server (first run only — this may take a minute)..." >&2
-  if ! "${PLUGIN_DIR}/mvnw" -f "${PLUGIN_DIR}/pom.xml" package -DskipTests -q 2>&1; then
-    echo "ERROR: Build failed. Ensure Java 21+ and internet access are available, then restart." >&2
-    exit 1
-  fi
-  JAR_PATH=$(find_jar)
+if [ ! -f "$JAR_PATH" ]; then
+  echo "Building strimzi-mcp-server..." >&2
+  "${PLUGIN_DIR}/mvnw" -f "${PLUGIN_DIR}/pom.xml" package -DskipTests -q
+  # Rename to a stable name regardless of version in pom.xml
+  BUILT_JAR=$(ls "${PLUGIN_DIR}/target"/strimzi-mcp-server-*.jar | head -1)
+  mv "$BUILT_JAR" "$JAR_PATH"
 fi
 
 exec java -jar "$JAR_PATH" "$@"

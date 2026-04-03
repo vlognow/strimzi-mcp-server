@@ -1,6 +1,6 @@
 package io.seequick.mcp.tool.factory;
 
-import io.seequick.mcp.KubernetesClientResolver;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.seequick.mcp.tool.StrimziTool;
 import io.seequick.mcp.tool.topic.CompareTopicConfigTool;
 import io.seequick.mcp.tool.topic.CreateTopicTool;
@@ -19,16 +19,16 @@ import java.util.List;
 public class TopicToolFactory implements ToolFactory {
 
     @Override
-    public List<StrimziTool> createTools(KubernetesClientResolver clientResolver) {
+    public List<StrimziTool> createTools(KubernetesClient client) {
         return List.of(
-                new ListTopicsTool(clientResolver),
-                new DescribeTopicTool(clientResolver),
-                new CreateTopicTool(clientResolver),
-                new DeleteTopicTool(clientResolver),
-                new UpdateTopicConfigTool(clientResolver),
-                new GetUnreadyTopicsTool(clientResolver),
-                new GetTopicOperatorStatusTool(clientResolver),
-                new CompareTopicConfigTool(clientResolver)
+                new ListTopicsTool(client),
+                new DescribeTopicTool(client),
+                new CreateTopicTool(client),
+                new DeleteTopicTool(client),
+                new UpdateTopicConfigTool(client),
+                new GetUnreadyTopicsTool(client),
+                new GetTopicOperatorStatusTool(client),
+                new CompareTopicConfigTool(client)
         );
     }
 }

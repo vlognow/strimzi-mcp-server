@@ -2,7 +2,6 @@ package io.seequick.mcp.tool.security;
 
 import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -44,8 +43,8 @@ public class GetCertificateExpiryTool extends AbstractStrimziTool {
             }
             """;
 
-    public GetCertificateExpiryTool(KubernetesClientResolver clientResolver) {
-        super(clientResolver);
+    public GetCertificateExpiryTool(KubernetesClient kubernetesClient) {
+        super(kubernetesClient);
     }
 
     @Override

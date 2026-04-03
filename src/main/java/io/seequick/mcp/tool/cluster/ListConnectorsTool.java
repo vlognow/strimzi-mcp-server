@@ -1,6 +1,6 @@
 package io.seequick.mcp.tool.cluster;
 
-import io.seequick.mcp.KubernetesClientResolver;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -32,8 +32,8 @@ public class ListConnectorsTool extends AbstractStrimziTool {
             }
             """;
 
-    public ListConnectorsTool(KubernetesClientResolver clientResolver) {
-        super(clientResolver);
+    public ListConnectorsTool(KubernetesClient kubernetesClient) {
+        super(kubernetesClient);
     }
 
     @Override

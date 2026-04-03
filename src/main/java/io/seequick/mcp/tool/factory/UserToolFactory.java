@@ -1,6 +1,6 @@
 package io.seequick.mcp.tool.factory;
 
-import io.seequick.mcp.KubernetesClientResolver;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.seequick.mcp.tool.StrimziTool;
 import io.seequick.mcp.tool.user.CreateUserTool;
 import io.seequick.mcp.tool.user.DeleteUserTool;
@@ -20,17 +20,17 @@ import java.util.List;
 public class UserToolFactory implements ToolFactory {
 
     @Override
-    public List<StrimziTool> createTools(KubernetesClientResolver clientResolver) {
+    public List<StrimziTool> createTools(KubernetesClient client) {
         return List.of(
-                new ListUsersTool(clientResolver),
-                new DescribeUserTool(clientResolver),
-                new CreateUserTool(clientResolver),
-                new DeleteUserTool(clientResolver),
-                new GetUserCredentialsTool(clientResolver),
-                new GetUserOperatorStatusTool(clientResolver),
-                new UpdateUserAclsTool(clientResolver),
-                new UpdateUserQuotasTool(clientResolver),
-                new ListUserAclsTool(clientResolver)
+                new ListUsersTool(client),
+                new DescribeUserTool(client),
+                new CreateUserTool(client),
+                new DeleteUserTool(client),
+                new GetUserCredentialsTool(client),
+                new GetUserOperatorStatusTool(client),
+                new UpdateUserAclsTool(client),
+                new UpdateUserQuotasTool(client),
+                new ListUserAclsTool(client)
         );
     }
 }

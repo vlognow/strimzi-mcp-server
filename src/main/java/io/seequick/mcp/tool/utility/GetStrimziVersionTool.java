@@ -3,7 +3,6 @@ package io.seequick.mcp.tool.utility;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -32,8 +31,8 @@ public class GetStrimziVersionTool extends AbstractStrimziTool {
             }
             """;
 
-    public GetStrimziVersionTool(KubernetesClientResolver clientResolver) {
-        super(clientResolver);
+    public GetStrimziVersionTool(KubernetesClient kubernetesClient) {
+        super(kubernetesClient);
     }
 
     @Override

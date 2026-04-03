@@ -6,7 +6,6 @@ import io.fabric8.kubernetes.api.model.ContainerStatusBuilder;
 import io.fabric8.kubernetes.api.model.ContainerStateBuilder;
 import io.fabric8.kubernetes.api.model.ContainerStateRunningBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.seequick.mcp.KubernetesClientResolver;
 import io.fabric8.kubernetes.client.server.mock.EnableKubernetesMockClient;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
@@ -29,7 +28,7 @@ class GetUserOperatorStatusToolTest {
 
     @BeforeEach
     void setUp() {
-        tool = new GetUserOperatorStatusTool(KubernetesClientResolver.fixed(client));
+        tool = new GetUserOperatorStatusTool(client);
     }
 
     @Test

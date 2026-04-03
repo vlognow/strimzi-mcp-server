@@ -2,7 +2,6 @@ package io.seequick.mcp.tool.observability;
 
 import io.fabric8.kubernetes.api.model.Event;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.seequick.mcp.KubernetesClientResolver;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.JsonSchema;
@@ -46,8 +45,8 @@ public class GetKafkaEventsTool extends AbstractStrimziTool {
             }
             """;
 
-    public GetKafkaEventsTool(KubernetesClientResolver clientResolver) {
-        super(clientResolver);
+    public GetKafkaEventsTool(KubernetesClient kubernetesClient) {
+        super(kubernetesClient);
     }
 
     @Override
