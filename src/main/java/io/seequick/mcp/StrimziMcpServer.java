@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
-import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
+import io.modelcontextprotocol.server.transport.HttpServletSseServerTransportProvider;
 import io.modelcontextprotocol.server.transport.StdioServerTransportProvider;
 import io.modelcontextprotocol.spec.McpSchema.ServerCapabilities;
 import io.seequick.mcp.tool.StrimziTool;
@@ -118,13 +118,16 @@ public class StrimziMcpServer {
     }
 
     /**
-     * Starts the MCP server with HTTP streamable transport on the given port.
+     * Starts the MCP server with SSE transport on the given port.
      * Activated when MCP_HTTP_PORT environment variable is set.
      */
     public void startHttp(int port) {
-        HttpServletStreamableServerTransportProvider transportProvider =
-                HttpServletStreamableServerTransportProvider.builder()
-                        .mcpEndpoint("/mcp")
+        String baseUrl = "http://localhost:" + port;
+        HttpServletSseServerTransportProvider transportProvider =
+                HttpServletSseServerTransportProvider.builder()
+                        .baseUrl(baseUrl)
+                        .sseEndpoint("/sse")
+                        .messageEndpoint("/messages")
                         .build();
 
         McpSyncServer syncServer = McpServer.sync(transportProvider)
