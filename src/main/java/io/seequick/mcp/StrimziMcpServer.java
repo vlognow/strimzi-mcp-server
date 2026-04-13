@@ -175,24 +175,19 @@ public class StrimziMcpServer {
                         ? "https" : "http";
 
                 // RFC 9728 Protected Resource Metadata — path-based or server-wide.
-                // Claude Code uses this to discover which authorization server protects the resource.
+                // Point authorization_servers to ourselves (not directly to Entra), so Claude Code
+                // fetches our /.well-known/oauth-authorization-server which has the registration_endpoint.
+                // Our discovery doc then directs the client to Entra for authorize/token.
                 if (uri.equals("/.well-known/oauth-protected-resource")
                         || uri.startsWith("/.well-known/oauth-protected-resource/")) {
                     httpRes.setStatus(200);
                     httpRes.setContentType("application/json");
-                    if (entraValidator != null) {
-                        String tid = entraValidator.tenantId();
-                        String cid = entraValidator.clientId();
-                        httpRes.getWriter().write(
-                                "{\"resource\":\"" + scheme + "://" + host + "\""
-                                + ",\"authorization_servers\":[\"https://login.microsoftonline.com/" + tid + "/v2.0\"]"
-                                + ",\"bearer_methods_supported\":[\"header\"]"
-                                + ",\"scopes_supported\":[\"api://" + cid + "/mcp.access\"]}");
-                    } else {
-                        httpRes.getWriter().write(
-                                "{\"resource\":\"" + scheme + "://" + host + "\""
-                                + ",\"bearer_methods_supported\":[\"header\"]}");
-                    }
+                    String cid = entraValidator != null ? entraValidator.clientId() : null;
+                    httpRes.getWriter().write(
+                            "{\"resource\":\"" + scheme + "://" + host + "\""
+                            + ",\"authorization_servers\":[\"" + scheme + "://" + host + "\"]"
+                            + ",\"bearer_methods_supported\":[\"header\"]"
+                            + (cid != null ? ",\"scopes_supported\":[\"api://" + cid + "/mcp.access\"]}" : "}"));
                     return;
                 }
 
