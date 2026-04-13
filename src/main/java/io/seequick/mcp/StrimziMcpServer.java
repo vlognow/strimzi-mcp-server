@@ -174,6 +174,28 @@ public class StrimziMcpServer {
                 String scheme = (host != null && !host.startsWith("localhost") && !host.startsWith("127.0.0.1"))
                         ? "https" : "http";
 
+                // RFC 9728 Protected Resource Metadata — path-based or server-wide.
+                // Claude Code uses this to discover which authorization server protects the resource.
+                if (uri.equals("/.well-known/oauth-protected-resource")
+                        || uri.startsWith("/.well-known/oauth-protected-resource/")) {
+                    httpRes.setStatus(200);
+                    httpRes.setContentType("application/json");
+                    if (entraValidator != null) {
+                        String tid = entraValidator.tenantId();
+                        String cid = entraValidator.clientId();
+                        httpRes.getWriter().write(
+                                "{\"resource\":\"" + scheme + "://" + host + "\""
+                                + ",\"authorization_servers\":[\"https://login.microsoftonline.com/" + tid + "/v2.0\"]"
+                                + ",\"bearer_methods_supported\":[\"header\"]"
+                                + ",\"scopes_supported\":[\"api://" + cid + "/mcp.access\"]}");
+                    } else {
+                        httpRes.getWriter().write(
+                                "{\"resource\":\"" + scheme + "://" + host + "\""
+                                + ",\"bearer_methods_supported\":[\"header\"]}");
+                    }
+                    return;
+                }
+
                 if (uri.equals("/.well-known/oauth-authorization-server")
                         || uri.equals("/.well-known/openid-configuration")) {
                     httpRes.setStatus(200);
@@ -257,7 +279,9 @@ public class StrimziMcpServer {
                 if (entraValidator != null) {
                     String authHeader = httpReq.getHeader("Authorization");
                     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                        httpRes.setHeader("WWW-Authenticate", "Bearer realm=\"strimzi-mcp-server\"");
+                        System.err.println("[MCP] 401 no token on " + uri);
+                        httpRes.setHeader("WWW-Authenticate", "Bearer realm=\"strimzi-mcp-server\""
+                                + ",resource_metadata=\"" + scheme + "://" + host + "/.well-known/oauth-protected-resource\"");
                         httpRes.setStatus(401);
                         httpRes.setContentType("application/json");
                         httpRes.getWriter().write("{\"error\":\"unauthorized\"}");
@@ -266,10 +290,12 @@ public class StrimziMcpServer {
                     String token = authHeader.substring("Bearer ".length());
                     try {
                         entraValidator.validate(token);
+                        System.err.println("[MCP] auth ok on " + uri);
                     } catch (Exception e) {
-                        System.err.println("[MCP] auth rejected: " + e.getMessage());
+                        System.err.println("[MCP] 401 invalid token on " + uri + ": " + e.getMessage());
                         httpRes.setHeader("WWW-Authenticate",
-                                "Bearer realm=\"strimzi-mcp-server\", error=\"invalid_token\"");
+                                "Bearer realm=\"strimzi-mcp-server\", error=\"invalid_token\""
+                                + ",resource_metadata=\"" + scheme + "://" + host + "/.well-known/oauth-protected-resource\"");
                         httpRes.setStatus(401);
                         httpRes.setContentType("application/json");
                         httpRes.getWriter().write("{\"error\":\"unauthorized\"}");
