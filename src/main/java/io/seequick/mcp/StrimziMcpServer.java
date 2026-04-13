@@ -134,7 +134,14 @@ public class StrimziMcpServer {
                 ? new EntraJwtValidator(entraTenantId, entraClientId)
                 : null;
 
-        String baseUrl = "http://localhost:" + port;
+        // MCP_BASE_URL must be set to the publicly reachable URL when deployed (e.g.
+        // https://strimzi-mcp.dev.machinify.net). The SSE transport sends this URL to
+        // clients so they know where to POST messages — if it's localhost the client
+        // can't reach it.
+        String baseUrl = System.getenv("MCP_BASE_URL");
+        if (baseUrl == null || baseUrl.isBlank()) {
+            baseUrl = "http://localhost:" + port;
+        }
         HttpServletSseServerTransportProvider transportProvider =
                 HttpServletSseServerTransportProvider.builder()
                         .baseUrl(baseUrl)
