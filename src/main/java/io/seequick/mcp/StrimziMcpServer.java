@@ -174,23 +174,6 @@ public class StrimziMcpServer {
                 String scheme = (host != null && !host.startsWith("localhost") && !host.startsWith("127.0.0.1"))
                         ? "https" : "http";
 
-                // RFC 9728 Protected Resource Metadata — path-based or server-wide.
-                // Point authorization_servers to ourselves (not directly to Entra), so Claude Code
-                // fetches our /.well-known/oauth-authorization-server which has the registration_endpoint.
-                // Our discovery doc then directs the client to Entra for authorize/token.
-                if (uri.equals("/.well-known/oauth-protected-resource")
-                        || uri.startsWith("/.well-known/oauth-protected-resource/")) {
-                    httpRes.setStatus(200);
-                    httpRes.setContentType("application/json");
-                    String cid = entraValidator != null ? entraValidator.clientId() : null;
-                    httpRes.getWriter().write(
-                            "{\"resource\":\"" + scheme + "://" + host + "\""
-                            + ",\"authorization_servers\":[\"" + scheme + "://" + host + "\"]"
-                            + ",\"bearer_methods_supported\":[\"header\"]"
-                            + (cid != null ? ",\"scopes_supported\":[\"api://" + cid + "/mcp.access\"]}" : "}"));
-                    return;
-                }
-
                 if (uri.equals("/.well-known/oauth-authorization-server")
                         || uri.equals("/.well-known/openid-configuration")) {
                     httpRes.setStatus(200);
