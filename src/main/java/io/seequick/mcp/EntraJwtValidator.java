@@ -38,6 +38,14 @@ class EntraJwtValidator {
         this.clientId = clientId;
     }
 
+    /** Test-only constructor — injects pre-loaded keys to avoid live JWKS calls. */
+    EntraJwtValidator(String tenantId, String clientId, Map<String, PublicKey> preloadedKeys) {
+        this.tenantId = tenantId;
+        this.clientId = clientId;
+        this.jwksCache = preloadedKeys;
+        this.jwksCachedAtEpoch = Instant.now().getEpochSecond();
+    }
+
     String tenantId() { return tenantId; }
     String clientId() { return clientId; }
 
