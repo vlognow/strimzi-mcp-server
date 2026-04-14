@@ -5,8 +5,6 @@ import io.seequick.mcp.tool.StrimziTool;
 import io.seequick.mcp.tool.kafka.GetKafkaListenersTool;
 import io.seequick.mcp.tool.kafka.GetKafkaStatusTool;
 import io.seequick.mcp.tool.kafka.ListKafkasTool;
-import io.seequick.mcp.tool.kafka.RestartKafkaBrokerTool;
-import io.seequick.mcp.tool.kafka.ScaleNodePoolTool;
 
 import java.util.List;
 
@@ -20,9 +18,10 @@ public class KafkaToolFactory implements ToolFactory {
         return List.of(
                 new ListKafkasTool(client),
                 new GetKafkaStatusTool(client),
-                new GetKafkaListenersTool(client),
-                new RestartKafkaBrokerTool(client),
-                new ScaleNodePoolTool(client)
+                new GetKafkaListenersTool(client)
+                // Write tools (re-enable by importing and adding):
+                // new RestartKafkaBrokerTool(client),
+                // new ScaleNodePoolTool(client)
         );
     }
 }
