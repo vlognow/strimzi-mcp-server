@@ -1,8 +1,16 @@
 {
   "mcpServers": {
-    "strimzi": {
-      "command": "${CLAUDE_PLUGIN_ROOT}/bin/strimzi-mcp",
-      "args": []
+    "strimzi-dev": {
+      "type": "http",
+      "url": "https://strimzi-mcp.dev.machinify.net/mcp"
+    },
+    "strimzi-stg": {
+      "type": "http",
+      "url": "https://strimzi-mcp.stg.machinify.net/mcp"
+    },
+    "strimzi-cleardata": {
+      "type": "http",
+      "url": "https://strimzi-mcp.machinify.net/mcp"
     }
   }
 }
