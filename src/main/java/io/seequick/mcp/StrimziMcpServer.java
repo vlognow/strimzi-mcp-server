@@ -130,13 +130,27 @@ public class StrimziMcpServer {
      * (suitable for local development only).
      */
     public void startHttp(int port) {
+        startHttp(port, buildEntraValidatorFromEnv());
+    }
+
+    /**
+     * Builds the Entra JWT validator from environment variables, or returns {@code null}
+     * (open/no-auth mode) when ENTRA_TENANT_ID / ENTRA_CLIENT_ID are not both set.
+     */
+    static EntraJwtValidator buildEntraValidatorFromEnv() {
         String entraTenantId = System.getenv("ENTRA_TENANT_ID");
         String entraClientId = System.getenv("ENTRA_CLIENT_ID");
-        EntraJwtValidator entraValidator = (entraTenantId != null && !entraTenantId.isBlank()
+        return (entraTenantId != null && !entraTenantId.isBlank()
                 && entraClientId != null && !entraClientId.isBlank())
                 ? new EntraJwtValidator(entraTenantId, entraClientId)
                 : null;
+    }
 
+    /**
+     * Starts the HTTP server with the given validator ({@code null} = open/no-auth mode).
+     * Package-private overload so tests can inject a validator without environment variables.
+     */
+    void startHttp(int port, EntraJwtValidator entraValidator) {
         HttpServletStreamableServerTransportProvider transportProvider =
                 HttpServletStreamableServerTransportProvider.builder()
                         .jsonMapper(new JacksonMcpJsonMapper(new ObjectMapper()))
@@ -175,6 +189,31 @@ public class StrimziMcpServer {
                 // Use https for real hostnames; http for local dev
                 String scheme = (host != null && !host.startsWith("localhost") && !host.startsWith("127.0.0.1"))
                         ? "https" : "http";
+
+                // RFC 9728 Protected Resource Metadata — advertised in the WWW-Authenticate
+                // header on 401s. MCP clients (Claude Code) fetch this to discover the
+                // authorization server and the scope to request. Without it the client sends
+                // an authorize/token request with no scope and Entra returns AADSTS900144.
+                if (uri.equals("/.well-known/oauth-protected-resource")
+                        || uri.equals("/.well-known/oauth-protected-resource/mcp")) {
+                    httpRes.setStatus(200);
+                    httpRes.setContentType("application/json");
+                    String resource = scheme + "://" + host;
+                    if (entraValidator != null) {
+                        String cid = entraValidator.clientId();
+                        httpRes.getWriter().write(
+                                "{\"resource\":\"" + resource + "\""
+                                + ",\"authorization_servers\":[\"" + resource + "\"]"
+                                + ",\"scopes_supported\":[\"api://" + cid + "/mcp.access\"]"
+                                + ",\"bearer_methods_supported\":[\"header\"]}");
+                    } else {
+                        httpRes.getWriter().write(
+                                "{\"resource\":\"" + resource + "\""
+                                + ",\"authorization_servers\":[\"" + resource + "\"]"
+                                + ",\"bearer_methods_supported\":[\"header\"]}");
+                    }
+                    return;
+                }
 
                 if (uri.equals("/.well-known/oauth-authorization-server")
                         || uri.equals("/.well-known/openid-configuration")) {
