@@ -1,0 +1,30 @@
+version: 2
+updates:
+  # Open scheduled, reviewable PRs for Maven dependency updates.
+  # PRs only — Dependabot never merges on its own and there is no auto-merge
+  # workflow in this repo. Automatic security-fix PRs are disabled at the repo
+  # level (Settings → Code security); update bumps come through these PRs.
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      # Collapse low-risk minor/patch bumps into a single PR to cut review noise.
+      maven-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Keep GitHub Actions used by release.yml current (low volume).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
